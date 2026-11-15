@@ -1,6 +1,6 @@
 
 #include <iostream>
-#include <SFML/Graphics.hpp>
+#include <SFML/Graphics.hpp>//we used sfml 2.6
 
 using namespace std;
 
