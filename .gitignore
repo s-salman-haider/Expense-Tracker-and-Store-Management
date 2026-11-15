@@ -1,0 +1,19 @@
+
+# Visual Studio temporary files
+.vs/
+**/.vs/
+
+# Build directories
+[Bb]in/
+[Oo]bj/
+x64/
+x86/
+
+# User-specific files
+*.user
+*.suo
+*.cache
+
+# Temporary files
+*.tmp
+*.log
