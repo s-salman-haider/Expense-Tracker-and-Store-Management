@@ -1,6 +1,6 @@
-
 #include <iostream>
 #include <SFML/Graphics.hpp>//we used sfml 2.6
+#include <fstream>
 
 using namespace std;
 
@@ -227,6 +227,256 @@ void setStatus(const char message[])
 
     status[i] = '\0';
 }
+
+
+// ================= FILE STORAGE =================
+// Records are stored in store_data.txt in the program's working folder.
+
+bool readFileCount(ifstream& file, int& count)
+{
+    if (!(file >> count))
+        return false;
+
+    file.ignore(10000, '\n');
+
+    if (count < 0 || count > MAX)
+    {
+        count = 0;
+        return false;
+    }
+
+    return true;
+}
+
+bool readFileText(ifstream& file, char text[])
+{
+    file.getline(text, SIZE);
+    return !file.fail();
+}
+
+template <typename T>
+bool readFileValue(ifstream& file, T& value)
+{
+    if (!(file >> value))
+        return false;
+
+    file.ignore(10000, '\n');
+    return true;
+}
+
+bool saveData()
+{
+    ofstream file("store_data.txt");
+
+    if (!file)
+    {
+        setStatus("Could not open store_data.txt for saving!");
+        return false;
+    }
+
+    file << "STORE_TRACKER_V1" << endl;
+
+    // Expenses
+    file << expenseCount << endl;
+    for (int i = 0; i < expenseCount; i++)
+    {
+        file << expenseName[i] << endl;
+        file << expenseCategory[i] << endl;
+        file << expenseAmount[i] << endl;
+    }
+
+    // Products
+    file << productCount << endl;
+    for (int i = 0; i < productCount; i++)
+    {
+        file << productName[i] << endl;
+        file << productQuantity[i] << endl;
+        file << productCost[i] << endl;
+        file << productPrice[i] << endl;
+    }
+
+    // Employees
+    file << employeeCount << endl;
+    for (int i = 0; i < employeeCount; i++)
+    {
+        file << employeeName[i] << endl;
+        file << employeeRole[i] << endl;
+        file << employeeSalary[i] << endl;
+        file << employeeBonus[i] << endl;
+    }
+
+    // Suppliers
+    file << supplierCount << endl;
+    for (int i = 0; i < supplierCount; i++)
+    {
+        file << supplierName[i] << endl;
+        file << supplierPhone[i] << endl;
+        file << supplierItem[i] << endl;
+    }
+
+    // Sales
+    file << saleCount << endl;
+    for (int i = 0; i < saleCount; i++)
+    {
+        file << saleProduct[i] << endl;
+        file << saleQuantity[i] << endl;
+        file << saleTotal[i] << endl;
+    }
+
+    // Deliveries
+    file << deliveryCount << endl;
+    for (int i = 0; i < deliveryCount; i++)
+    {
+        file << deliveryProduct[i] << endl;
+        file << deliveryDestination[i] << endl;
+        file << deliveryQuantity[i] << endl;
+        file << deliveryCost[i] << endl;
+    }
+
+    file.close();
+
+    if (!file)
+    {
+        setStatus("Error while writing store_data.txt!");
+        return false;
+    }
+
+    return true;
+}
+
+void loadData()
+{
+    ifstream file("store_data.txt");
+
+    if (!file)
+    {
+        setStatus("No saved file found. Starting with empty records.");
+        return;
+    }
+
+    string version;
+    getline(file, version);
+
+    if (version != "STORE_TRACKER_V1")
+    {
+        setStatus("Saved file has an unknown format.");
+        return;
+    }
+
+    // Expenses
+    if (!readFileCount(file, expenseCount))
+    {
+        setStatus("Invalid expense data in file.");
+        return;
+    }
+    for (int i = 0; i < expenseCount; i++)
+    {
+        if (!readFileText(file, expenseName[i]) ||
+            !readFileText(file, expenseCategory[i]) ||
+            !readFileValue(file, expenseAmount[i]))
+        {
+            expenseCount = i;
+            setStatus("Some expense data could not be loaded.");
+            return;
+        }
+    }
+
+    // Products
+    if (!readFileCount(file, productCount))
+    {
+        setStatus("Invalid product data in file.");
+        return;
+    }
+    for (int i = 0; i < productCount; i++)
+    {
+        if (!readFileText(file, productName[i]) ||
+            !readFileValue(file, productQuantity[i]) ||
+            !readFileValue(file, productCost[i]) ||
+            !readFileValue(file, productPrice[i]))
+        {
+            productCount = i;
+            setStatus("Some product data could not be loaded.");
+            return;
+        }
+    }
+
+    // Employees
+    if (!readFileCount(file, employeeCount))
+    {
+        setStatus("Invalid employee data in file.");
+        return;
+    }
+    for (int i = 0; i < employeeCount; i++)
+    {
+        if (!readFileText(file, employeeName[i]) ||
+            !readFileText(file, employeeRole[i]) ||
+            !readFileValue(file, employeeSalary[i]) ||
+            !readFileValue(file, employeeBonus[i]))
+        {
+            employeeCount = i;
+            setStatus("Some employee data could not be loaded.");
+            return;
+        }
+    }
+
+    // Suppliers
+    if (!readFileCount(file, supplierCount))
+    {
+        setStatus("Invalid supplier data in file.");
+        return;
+    }
+    for (int i = 0; i < supplierCount; i++)
+    {
+        if (!readFileText(file, supplierName[i]) ||
+            !readFileText(file, supplierPhone[i]) ||
+            !readFileText(file, supplierItem[i]))
+        {
+            supplierCount = i;
+            setStatus("Some supplier data could not be loaded.");
+            return;
+        }
+    }
+
+    // Sales
+    if (!readFileCount(file, saleCount))
+    {
+        setStatus("Invalid sales data in file.");
+        return;
+    }
+    for (int i = 0; i < saleCount; i++)
+    {
+        if (!readFileText(file, saleProduct[i]) ||
+            !readFileValue(file, saleQuantity[i]) ||
+            !readFileValue(file, saleTotal[i]))
+        {
+            saleCount = i;
+            setStatus("Some sales data could not be loaded.");
+            return;
+        }
+    }
+
+    // Deliveries
+    if (!readFileCount(file, deliveryCount))
+    {
+        setStatus("Invalid delivery data in file.");
+        return;
+    }
+    for (int i = 0; i < deliveryCount; i++)
+    {
+        if (!readFileText(file, deliveryProduct[i]) ||
+            !readFileText(file, deliveryDestination[i]) ||
+            !readFileValue(file, deliveryQuantity[i]) ||
+            !readFileValue(file, deliveryCost[i]))
+        {
+            deliveryCount = i;
+            setStatus("Some delivery data could not be loaded.");
+            return;
+        }
+    }
+
+    setStatus("Saved records loaded from store_data.txt.");
+}
+
 
 //functions for store management
 
@@ -859,7 +1109,11 @@ void saveRecord()
 
     if (success)
     {
-        setStatus("Record saved successfully!");
+        if (saveData())
+            setStatus("Record saved successfully!");
+        else
+            setStatus("Record added, but could not save to file!");
+
         clearAllFields();
     }
     else
@@ -885,6 +1139,7 @@ int main()
         return 1;
     }
 
+    loadData();
     setupFields();
 
     //main application loop
@@ -956,6 +1211,8 @@ int main()
 
         window.display();
     }
+
+    saveData();
 
     return 0;
 }

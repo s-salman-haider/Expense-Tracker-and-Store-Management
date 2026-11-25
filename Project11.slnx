@@ -3,5 +3,5 @@
     <Platform Name="x64" />
     <Platform Name="x86" />
   </Configurations>
-  <Project Path="Project11/Project11.vcxproj" Id="06327da4-e005-4493-a3f6-9aaf81d50b5e" />
+  <Project Path="expense tracker nad store management/Project11.vcxproj" Id="06327da4-e005-4493-a3f6-9aaf81d50b5e" />
 </Solution>
